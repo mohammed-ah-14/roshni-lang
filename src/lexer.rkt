@@ -11,7 +11,7 @@
 (define-empty-tokens punct-tokens
   (DHARA JALAO BULAO DIKHA
    DOHRA HAR JAB WARNA
-   JAMA  NIKALO WAPAS
+   JAMA  NIKALO WAPAS  END
    HAAN  NAHI   AS
    ARROW EQ    EQ2   NEQ
    LT    GT    LTE   GTE
@@ -47,6 +47,7 @@
    ("jama"   (token-JAMA))
    ("nikalo" (token-NIKALO))
    ("wapas"  (token-WAPAS))
+   ("end"    (token-END))
    ("haan"   (token-HAAN))
    ("nahi"   (token-NAHI))
    ("as"     (token-AS))
@@ -84,6 +85,7 @@
    (","  (token-COMMA))
 
    ((eof) (token-EOF))))
+(provide roshni-lexer value-tokens punct-tokens)
 
 ;; ── 5. Tokenise a string and print each token cleanly ──
 (define (tokenize-string str)
