@@ -78,6 +78,7 @@
     ;; ── stmt: all statement types ─────────────────────────
     (stmt
      [(dhara-stmt)   $1]   ; variable declaration
+     [(assign-stmt)  $1]   ; variable assignment
      [(jalao-stmt)   $1]   ; function definition
      [(dikha-stmt)   $1]   ; print statement
      [(dohra-stmt)   $1]   ; loop (for-each or while)
@@ -91,6 +92,13 @@
     (dhara-stmt
      [(DHARA ID EQ expr)
       (list 'dhara-decl $2 $4)])
+
+    ;; ── assignment: variable reassignment ─────────────────
+    ;; x = <expr>
+    ;; AST: (assign-stmt "x" <expr-node>)
+    (assign-stmt
+     [(ID EQ expr)
+      (list 'assign-stmt $1 $3)])
 
     ;; ── jalao: function definition ────────────────────────
     ;; jalao funcName (param1 param2 ...) -> body... end
