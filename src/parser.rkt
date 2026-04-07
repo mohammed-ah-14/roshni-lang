@@ -47,6 +47,7 @@
                                tok-name tok-value))
                 (error (format "ROSHNI parse error: invalid token '~a'"
                                tok-name)))))
+    (suppress)
 
    ;; ── Operator precedence (low → high, bottom wins) ──
    ;; This resolves ambiguity in arithmetic expressions.
@@ -209,6 +210,8 @@
 
     ))) ;; end of define roshni-parser
 
+(provide parse-roshni)
+
 
 ;; ═══════════════════════════════════════════════════════════
 ;; PUBLIC API
@@ -221,71 +224,71 @@
     (roshni-parser thunk)))
 
 
-;; ═══════════════════════════════════════════════════════════
-;; PARSER TESTS — remove before final submission
-;; Run with:  racket src/parser.rkt
-;; ═══════════════════════════════════════════════════════════
-(define (test-parse label code)
-  (display (string-append "--- " label " ---\n"))
-  (let ([ast (parse-roshni code)])
-    (for-each (lambda (node)
-                (display node)
-                (newline))
-              ast))
-  (newline))
+; ;; ═══════════════════════════════════════════════════════════
+; ;; PARSER TESTS — remove before final submission
+; ;; Run with:  racket src/parser.rkt
+; ;; ═══════════════════════════════════════════════════════════
+; (define (test-parse label code)
+;   (display (string-append "--- " label " ---\n"))
+;   (let ([ast (parse-roshni code)])
+;     (for-each (lambda (node)
+;                 (display node)
+;                 (newline))
+;               ast))
+;   (newline))
 
-;; Test 1: variable declaration
-(test-parse "dhara (variable)"
-  "dhara x = 5")
+; ;; Test 1: variable declaration
+; (test-parse "dhara (variable)"
+;   "dhara x = 5")
 
-;; Test 2: print string
-(test-parse "dikha (print)"
-  "dikha \"salam duniya\"")
+; ;; Test 2: print string
+; (test-parse "dikha (print)"
+;   "dikha \"salam duniya\"")
 
-;; Test 3: arithmetic expression
-(test-parse "arithmetic"
-  "dhara jawab = (3 + 4) * 2")
+; ;; Test 3: arithmetic expression
+; (test-parse "arithmetic"
+;   "dhara jawab = (3 + 4) * 2")
 
-;; Test 4: boolean
-(test-parse "boolean"
-  "dhara flag = haan")
+; ;; Test 4: boolean
+; (test-parse "boolean"
+;   "dhara flag = haan")
 
-;; Test 5: list
-(test-parse "jama (list)"
-  "dhara nums = jama(1, 2, 3)")
+; ;; Test 5: list
+; (test-parse "jama (list)"
+;   "dhara nums = jama(1, 2, 3)")
 
-;; Test 6: function call
-(test-parse "bulao (function call)"
-  "bulao double 10")
+; ;; Test 6: function call
+; (test-parse "bulao (function call)"
+;   "bulao double 10")
 
-;; Test 7: conditional
-(test-parse "jab/warna (if/else)"
-  "jab x == 5 ->
-     dikha \"haan!\"
-   warna
-     dikha \"nahi!\"
-   end")
+; ;; Test 7: conditional
+; (test-parse "jab/warna (if/else)"
+;   "jab x == 5 ->
+;      dikha \"haan!\"
+;    warna
+;      dikha \"nahi!\"
+;    end")
 
-;; Test 8: for-each loop
-(test-parse "dohra har (for-each loop)"
-  "dohra har nums as x ->
-     dikha x
-   end")
+; ;; Test 8: for-each loop
+; (test-parse "dohra har (for-each loop)"
+;   "dohra har nums as x ->
+;      dikha x
+;    end")
 
-;; Test 9: function definition
-(test-parse "jalao (function definition)"
-  "jalao double (n) ->
-     wapas n * 2
-   end")
+; ;; Test 9: function definition
+; (test-parse "jalao (function definition)"
+;   "jalao double (n) ->
+;      wapas n * 2
+;    end")
 
-;; Test 10: full fibonacci program
-(test-parse "fibonacci program"
-  "jalao fib (n) ->
-     jab n <= 1 ->
-       wapas n
-     warna
-       wapas (bulao fib n) + (bulao fib n)
-     end
-   end
-   dhara jawab = bulao fib 5
-   dikha jawab")
+; ;; Test 10: full fibonacci program
+; (test-parse "fibonacci program"
+;   "jalao fib (n) ->
+;      jab n <= 1 ->
+;        wapas n
+;      warna
+;        wapas (bulao fib n) + (bulao fib n)
+;      end
+;    end
+;    dhara jawab = bulao fib 5
+;    dikha jawab")
