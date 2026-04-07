@@ -192,15 +192,14 @@
      [(ID)      (list 'id-ref   $1)])
 
     ;; ── arg-list: arguments for bulao calls ───────────────
-    ;; bulao fib 10         → one arg
-    ;; bulao add x y        → two args
-    ;; bulao greet          → no args
-    ;; Args are space-separated expressions (no commas).
-    ;; We allow 0, 1, or 2 args to keep grammar unambiguous.
+    ;; bulao fib 10           → one arg
+    ;; bulao add 3, 7         → two args (comma-separated)
+    ;; bulao greet            → no args
+    ;; Args are comma-separated expressions (like param-list).
     (arg-list
-     [()            '()]
-     [(expr)        (list $1)]
-     [(expr expr)   (list $1 $2)])
+     [()                        '()]
+     [(expr)                    (list $1)]
+     [(expr COMMA arg-list)     (cons $1 $3)])
 
     ;; ── expr-list: comma-separated expressions ────────────
     ;; Used inside jama(1, 2, 3)
