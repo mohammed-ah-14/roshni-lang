@@ -34,20 +34,36 @@
 ;; make-child-env : creates a child scope that inherits parent
 (define (make-child-env parent)
   (let ([child (make-hash)])
-    ;; copy parent bindings into child
-    (hash-for-each parent
-      (lambda (k v) (hash-set! child k v)))
+    ;; store parent reference for environment chain lookups
+    (hash-set! child 'parent parent)
     child))
 
 ;; env-get : look up a name; error if not found
+;; Searches up the parent chain
 (define (env-get env name)
-  (if (hash-has-key? env name)
-      (hash-ref env name)
-      (error (format "ROSHNI: undefined variable '~a'" name))))
+  (cond
+    [(eq? name 'parent) #f]  ; skip 'parent key
+    [(hash-has-key? env name)
+     (hash-ref env name)]
+    [(hash-has-key? env 'parent)
+     (env-get (hash-ref env 'parent) name)]
+    [else
+     (error (format "ROSHNI: undefined variable '~a'" name))]))
 
 ;; env-set! : bind a name to a value in this scope
 (define (env-set! env name value)
   (hash-set! env name value))
+
+;; env-update! : update an existing variable in the environment chain
+;; Searches up the parent chain to find where the variable is defined
+(define (env-update! env name value)
+  (cond
+    [(hash-has-key? env name)
+     (hash-set! env name value)]
+    [(hash-has-key? env 'parent)
+     (env-update! (hash-ref env 'parent) name value)]
+    [else
+     (error (format "ROSHNI: undefined variable '~a'" name))]))
 
 
 ;; ── Binary operator dispatch ──────────────────────────────
@@ -89,6 +105,13 @@
     [(list 'dhara-decl name expr)
      (let ([val (eval-node expr env)])
        (env-set! env name val)
+       val)]
+
+    ;; ── assignment: variable reassignment ─────────────────
+    ;; x = 10  →  update existing "x" to 10 (searches parent scopes)
+    [(list 'assign-stmt name expr)
+     (let ([val (eval-node expr env)])
+       (env-update! env name val)
        val)]
 
     ;; ── jalao: function definition ────────────────────────
