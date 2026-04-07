@@ -1,0 +1,24 @@
+%% Test 3: Conditionals
+dhara umar = 20
+jab umar >= 18 ->
+  dikha "Aap baligha hain"
+warna
+  dikha "Aap na-baligha hain"
+end
+
+dhara score = 45
+jab score >= 50 ->
+  dikha "Pass"
+warna
+  dikha "Fail"
+end
+
+dhara flag = haan
+jab flag == haan ->
+  dikha "flag haan hai"
+end
+
+dhara x = 10
+jab x != 5 ->
+  dikha "x paanch nahi hai"
+end

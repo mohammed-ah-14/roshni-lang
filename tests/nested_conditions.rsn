@@ -1,0 +1,16 @@
+%% Test 9: Nested conditionals inside a function
+jalao classify (n) ->
+  jab n > 0 ->
+    dikha "musbat (positive)"
+  warna
+    jab n == 0 ->
+      dikha "sifar (zero)"
+    warna
+      dikha "manfi (negative)"
+    end
+  end
+end
+
+bulao classify 10
+bulao classify 0
+bulao classify -5

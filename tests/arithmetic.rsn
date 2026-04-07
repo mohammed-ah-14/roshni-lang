@@ -1,0 +1,11 @@
+%% Test 2: Arithmetic
+dhara a = 10
+dhara b = 3
+dikha a + b
+dikha a - b
+dikha a * b
+dikha a / b
+dikha 10 / 5
+dikha (a + b) * 2
+dhara jawab = (8 + 2) * 5
+dikha jawab

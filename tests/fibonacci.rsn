@@ -1,0 +1,14 @@
+%% Test 5: Fibonacci — recursion test
+jalao fib (n) ->
+  jab n <= 1 ->
+    wapas n
+  warna
+    wapas (bulao fib n - 1) + (bulao fib n - 2)
+  end
+end
+
+dikha bulao fib 0
+dikha bulao fib 1
+dikha bulao fib 5
+dikha bulao fib 8
+dikha bulao fib 10
