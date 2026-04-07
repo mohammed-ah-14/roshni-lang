@@ -87,46 +87,46 @@
    ((eof) (token-EOF))))
 (provide roshni-lexer value-tokens punct-tokens)
 
-;; ── 5. Tokenise a string and print each token cleanly ──
-(define (tokenize-string str)
-  (let ([port (open-input-string str)])
-    (let loop ([tok (roshni-lexer port)])
-      (unless (eq? tok 'EOF)
-        ;; tok is either a plain symbol (empty token) or a (token name value) struct
-        (cond
-          [(symbol? tok)
-           (printf "~a\n" tok)]
-          [(token? tok)
-           (let ([n (token-name  tok)]
-                 [v (token-value tok)])
-             (if v
-                 (printf "(~a ~a)\n" n v)
-                 (printf "~a\n"      n)))]
-          [else
-           (printf "UNKNOWN: ~a\n" tok)])
-        (loop (roshni-lexer port))))))
+; ;; ── 5. Tokenise a string and print each token cleanly ──
+; (define (tokenize-string str)
+;   (let ([port (open-input-string str)])
+;     (let loop ([tok (roshni-lexer port)])
+;       (unless (eq? tok 'EOF)
+;         ;; tok is either a plain symbol (empty token) or a (token name value) struct
+;         (cond
+;           [(symbol? tok)
+;            (printf "~a\n" tok)]
+;           [(token? tok)
+;            (let ([n (token-name  tok)]
+;                  [v (token-value tok)])
+;              (if v
+;                  (printf "(~a ~a)\n" n v)
+;                  (printf "~a\n"      n)))]
+;           [else
+;            (printf "UNKNOWN: ~a\n" tok)])
+;         (loop (roshni-lexer port))))))
 
-;; ── 6. Test runs ──
-(displayln "--- test 1: variable declaration ---")
-(tokenize-string "dhara x = 5")
+; ;; ── 6. Test runs ──
+; (displayln "--- test 1: variable declaration ---")
+; (tokenize-string "dhara x = 5")
 
-(displayln "--- test 2: function definition ---")
-(tokenize-string "jalao fib (n) ->")
+; (displayln "--- test 2: function definition ---")
+; (tokenize-string "jalao fib (n) ->")
 
-(displayln "--- test 3: print string ---")
-(tokenize-string "dikha \"hello world\"")
+; (displayln "--- test 3: print string ---")
+; (tokenize-string "dikha \"hello world\"")
 
-(displayln "--- test 4: for-each loop ---")
-(tokenize-string "dohra har numList as x ->")
+; (displayln "--- test 4: for-each loop ---")
+; (tokenize-string "dohra har numList as x ->")
 
-(displayln "--- test 5: conditional ---")
-(tokenize-string "jab x == 5")
+; (displayln "--- test 5: conditional ---")
+; (tokenize-string "jab x == 5")
 
-(displayln "--- test 6: arithmetic ---")
-(tokenize-string "dhara jawab = (3 + 4) * 2")
+; (displayln "--- test 6: arithmetic ---")
+; (tokenize-string "dhara jawab = (3 + 4) * 2")
 
-(displayln "--- test 7: boolean ---")
-(tokenize-string "dhara flag = haan")
+; (displayln "--- test 7: boolean ---")
+; (tokenize-string "dhara flag = haan")
 
-(displayln "--- test 8: list ---")
-(tokenize-string "dhara nums = jama(1, 2, 3)")
+; (displayln "--- test 8: list ---")
+; (tokenize-string "dhara nums = jama(1, 2, 3)")
