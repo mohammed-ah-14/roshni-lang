@@ -74,7 +74,7 @@
     [(*)  (* left right)]
     [(/)  (if (= right 0)
               (error "ROSHNI: taqseem sifar se nahi hoti (division by zero)")
-              (/ left right))]
+              (exact->inexact (/ left right)))]
     [(==) (equal? left right)]
     [(!=) (not (equal? left right))]
     [(<)  (< left right)]
