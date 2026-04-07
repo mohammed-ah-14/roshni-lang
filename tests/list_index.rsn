@@ -1,0 +1,5 @@
+%% Test 7: List index access
+dhara rang = jama("laal", "neela", "hara")
+dikha nikalo rang[0]
+dikha nikalo rang[1]
+dikha nikalo rang[2]

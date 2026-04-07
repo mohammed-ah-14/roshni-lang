@@ -1,0 +1,14 @@
+%% Test 6: Lists and loops
+dhara nums = jama(1, 2, 3, 4, 5)
+dikha nums
+
+dohra har nums as x ->
+  dikha x * 2
+end
+
+dhara cities = jama("Karachi", "Lahore", "Islamabad")
+dikha cities
+
+dohra har cities as shahar ->
+  dikha shahar
+end
