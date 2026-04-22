@@ -78,27 +78,27 @@ Output: `55`
 
 | ROSHNI - Latin Script | ROSHNI - Urdu Script | Meaning | English Equivalent |
 |--------|-------------|---------|-------------------|
-| `rakho` | رکھو | keep / store | `var` / `let` |
-| `banao` | بناؤ | build / make | `def` / function |
-| `bulao` | بلاؤ | call | function call |
-| `dikhao` | دکھاؤ | show | `print` |
-| `jabtak` | جبتک | while / as long as | `while` loop |
-| `har` | ہر | every / each | `for` loop |
-| `agar` | اگر | if | `if` |
-| `warna` | ورنہ | otherwise | `else` |
-| `warna-agar` | ورنہ اگر | otherwise if | `elif` / `else if` |
-| `fehrist` | فہرست | list / collection | list / array |
-| `lo` | لو | take / get | index access |
-| `wapas` | واپس | return | `return` |
-| `sahi` | صحیح | correct / true | `true` |
-| `ghalat` | غلط | wrong / false | `false` |
-| `aur` | اور | and | `&&` / `and` |
-| `ya` | یا | or | `\|\|` / `or` |
-| `nai` | نہیں | not | `!` / `not` |
-| `jodna` | جوڑنا | join / connect | string concatenation (`+` for strings) |
-| `end` | اختتام | end of block | `}` |
-| `tanqeed` | تنقید | comment | `//` |
-| `as` | بطور | loop alias | `as` / `in` |
+| `rakho` | `رکھو` | keep / store | `var` / `let` |
+| `banao` | `بناؤ` | build / make | `def` / function |
+| `bulao` | `بلاؤ` | call | function call |
+| `dikhao` | `دکھاؤ` | show | `print` |
+| `jabtak` | `جبتک` | while / as long as | `while` loop |
+| `har` | `ہر` | every / each | `for` loop |
+| `agar` | `اگر` | if | `if` |
+| `warna` | `ورنہ` | otherwise | `else` |
+| `warna-agar` | `ورنہ اگر` | otherwise if | `elif` / `else if` |
+| `fehrist` | `فہرست` | list / collection | list / array |
+| `lo` | `لو` | take / get | index access |
+| `wapas` | `واپس` | return | `return` |
+| `sahi` | `صحیح` | correct / true | `true` |
+| `ghalat` | `غلط` | wrong / false | `false` |
+| `aur` | `اور` | and | `&&` / `and` |
+| `ya` | `یا` | or | `\|\|` / `or` |
+| `nai` | `نہیں` | not | `!` / `not` |
+| `jodna` | `جوڑنا` | join / connect | string concatenation (`+` for strings) |
+| `end` | `اختتام` | end of block | `}` |
+| `tanqeed` | `تنقید` | comment | `//` |
+| `as` | `بطور` | loop alias | `as` / `in` |
 
 ### Notes on Urdu Script
 
