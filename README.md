@@ -2,12 +2,14 @@
 
 **ROSHNI** (روشنی, meaning *Light*) is a programming language with **Urdu-derived keywords**.
 
+ROSHNI now accepts both **Roman Urdu** and **Urdu script** for keywords, and it also allows **Urdu-script identifiers** for your own variable, function, and parameter names.
+
 Instead of writing `if`, `while`, `print`, or `return`, you write `agar`, `jabtak`, `dikhao`, and `wapas` — bringing the syntax closer to Urdu speakers while demonstrating how a complete interpreter pipeline (lexer → parser → interpreter) works from scratch.
 
 ---
 
 ## What ROSHNI Looks Like
-
+### Using Roman Script
 ```
 tanqeed Fibonacci ROSHNI mein
 banao fib (n) ->
@@ -23,9 +25,25 @@ dikhao bulao fib 10
 
 Output: `55`
 
----
+#
+### Using Urdu Script
+```
+تنقید Fibonacci ROSHNI میں
+بناؤ فیب (ن) ->
+  اگر ن <= 1 ->
+    واپس ن
+  ورنہ
+    واپس (بلاؤ فیب ن - 1) + (بلاؤ فیب ن - 2)
+  اختتام
+اختتام
 
-## What's New (v2)
+دکھاؤ بلاؤ فیب 10
+```
+
+Output: `55`
+
+---
+## What's New (v3)
 
 - **All keywords renamed** to more natural Urdu words (`rakho`, `banao`, `agar`, `dikhao`, …)
 - **`warna-agar`** — else-if (elif) chains, any number of them
@@ -33,12 +51,15 @@ Output: `55`
 - **Word arithmetic** — write `3 jama 4` instead of `3 + 4` (both work)
 - **Word comparisons** — write `x barabar y` instead of `x == y` (both work)
 - **`tanqeed`** — starts a line comment
+- **Urdu script support** — keywords and user-defined names can be written in Urdu script
 
 ---
 
 ## Key Features
 
 - **Urdu keywords** — all control flow, I/O, and declarations use Urdu-derived words
+- **Urdu script keywords** — you can use either Roman Urdu or Urdu script forms
+- **Urdu-script identifiers** — names like `مثال`, `عدد_کل`, and `جمع_عدد` are valid
 - **Variables** — dynamically typed, declared with `rakho`
 - **Functions** — first-class, lexically scoped closures defined with `banao`, called with `bulao`
 - **Recursion** — fully supported (see Fibonacci above)
@@ -55,13 +76,13 @@ Output: `55`
 
 ## Keyword Reference
 
-| ROSHNI | Urdu Script | Meaning | English Equivalent |
+| ROSHNI - Latin Script | ROSHNI - Urdu Script | Meaning | English Equivalent |
 |--------|-------------|---------|-------------------|
 | `rakho` | رکھو | keep / store | `var` / `let` |
 | `banao` | بناؤ | build / make | `def` / function |
 | `bulao` | بلاؤ | call | function call |
 | `dikhao` | دکھاؤ | show | `print` |
-| `jabtak` | جب تک | while / as long as | `while` loop |
+| `jabtak` | جبتک | while / as long as | `while` loop |
 | `har` | ہر | every / each | `for` loop |
 | `agar` | اگر | if | `if` |
 | `warna` | ورنہ | otherwise | `else` |
@@ -73,11 +94,17 @@ Output: `55`
 | `ghalat` | غلط | wrong / false | `false` |
 | `aur` | اور | and | `&&` / `and` |
 | `ya` | یا | or | `\|\|` / `or` |
-| `nai` | نئی | not | `!` / `not` |
+| `nai` | نہیں | not | `!` / `not` |
 | `jodna` | جوڑنا | join / connect | string concatenation (`+` for strings) |
-| `end` | — | end of block | `}` |
+| `end` | اختتام | end of block | `}` |
 | `tanqeed` | تنقید | comment | `//` |
-| `as` | — | loop alias | `as` / `in` |
+| `as` | بطور | loop alias | `as` / `in` |
+
+### Notes on Urdu Script
+
+- Keyword aliases are accepted in both Roman Urdu and Urdu script.
+- User-defined names can also be written in Urdu script, so you can use identifiers such as `مثال`, `جمع_عدد`, or `پہلا`.
+- Mixed-script programs are fine; for example, a Roman Urdu keyword can call an Urdu-script function name.
 
 ### Word Operator Reference
 
