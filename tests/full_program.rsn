@@ -1,0 +1,38 @@
+tanqeed Test 14: Full mixed program
+
+tanqeed --- Grade calculator ---
+
+banao hisaab_lagao (marks) ->
+  agar marks zyada-ya-barabar 90 ->
+    wapas "A"
+  warna-agar marks zyada-ya-barabar 80 ->
+    wapas "B"
+  warna-agar marks zyada-ya-barabar 70 ->
+    wapas "C"
+  warna-agar marks zyada-ya-barabar 60 ->
+    wapas "D"
+  warna
+    wapas "Fail"
+  end
+end
+
+rakho imtihaan = fehrist(92, 78, 65, 55, 88)
+rakho girda = 0
+
+har imtihaan as nishaan ->
+  girda = girda + nishaan
+end
+
+rakho kul = 5
+girda = girda taqseem kul
+
+dikhao "Girda: " jodna girda
+dikhao "Darjah: " jodna (bulao hisaab_lagao girda)
+
+tanqeed --- Multiplication table for 3 ---
+dikhao "--- Jadwal: 3 ---"
+rakho i = 1
+jabtak i <= 5 ->
+  dikhao "3 x " jodna i jodna " = " jodna 3 * i
+  i = i + 1
+end

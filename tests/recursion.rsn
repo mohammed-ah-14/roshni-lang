@@ -1,0 +1,26 @@
+tanqeed Test 12: Recursion
+
+banao fib (n) ->
+  agar n <= 1 ->
+    wapas n
+  warna
+    wapas (bulao fib n - 1) + (bulao fib n - 2)
+  end
+end
+
+dikhao bulao fib 0
+dikhao bulao fib 1
+dikhao bulao fib 5
+dikhao bulao fib 10
+
+tanqeed Factorial
+banao factorial (n) ->
+  agar n <= 1 ->
+    wapas 1
+  warna
+    wapas n * (bulao factorial n - 1)
+  end
+end
+
+dikhao bulao factorial 5
+dikhao bulao factorial 10

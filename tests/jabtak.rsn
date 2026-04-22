@@ -1,0 +1,15 @@
+tanqeed Test 7: While loop
+
+rakho i = 1
+jabtak i <= 5 ->
+  dikhao i
+  i = i + 1
+end
+
+tanqeed Countdown
+rakho n = 3
+jabtak n > 0 ->
+  dikhao n
+  n = n - 1
+end
+dikhao "Blast off!"

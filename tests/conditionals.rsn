@@ -1,0 +1,26 @@
+tanqeed Test 6: Conditionals
+
+rakho darja = 85
+
+tanqeed --- Test agar only ---
+agar darja > 80 ->
+  dikhao "achha hai"
+end
+
+tanqeed --- Test agar + warna ---
+agar darja > 90 ->
+  dikhao "A"
+warna
+  dikhao "A nahi"
+end
+
+tanqeed --- Test agar + warna-agar + warna ---
+agar darja zyada-ya-barabar 90 ->
+  dikhao "A"
+warna-agar darja zyada-ya-barabar 80 ->
+  dikhao "B"
+warna-agar darja zyada-ya-barabar 70 ->
+  dikhao "C"
+warna
+  dikhao "Fail"
+end

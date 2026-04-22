@@ -1,0 +1,18 @@
+tanqeed Test 8: For-each loop
+
+rakho phal = fehrist("aam", "kela", "anaar")
+
+har phal as cheez ->
+  dikhao cheez
+end
+
+tanqeed Sum of a list
+rakho ginti = fehrist(10, 20, 30, 40)
+rakho majmua = 0
+
+har ginti as adad ->
+  majmua = majmua + adad
+end
+
+dikhao "Majmua:"
+dikhao majmua

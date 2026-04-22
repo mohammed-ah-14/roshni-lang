@@ -1,0 +1,22 @@
+tanqeed Test 11: Functions
+
+tanqeed No-argument function
+banao salaam () ->
+  dikhao "As-salamu alaykum!"
+end
+
+bulao salaam
+
+tanqeed One argument
+banao double (n) ->
+  wapas n * 2
+end
+
+dikhao bulao double 7
+
+tanqeed Two arguments
+banao jama_karo (a, b) ->
+  wapas a + b
+end
+
+dikhao bulao jama_karo 10, 15

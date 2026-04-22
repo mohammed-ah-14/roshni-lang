@@ -1,0 +1,16 @@
+tanqeed Test 10: String concatenation
+
+rakho naam = "Ahmed"
+rakho umra = 22
+rakho wazn = 70.5
+
+dikhao "Naam: " jodna naam
+dikhao "Umra: " jodna umra jodna " saal"
+dikhao "Wazn: " jodna wazn jodna " kg"
+
+tanqeed Joining booleans
+rakho pass = sahi
+dikhao "Nateeja: " jodna pass
+
+tanqeed Arithmetic computes first, then joins
+dikhao "5 + 3 = " jodna 5 + 3

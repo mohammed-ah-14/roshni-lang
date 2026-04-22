@@ -1,0 +1,17 @@
+tanqeed Test 2: Variables
+
+tanqeed Declare
+rakho x = 10
+rakho y = 3.14
+rakho sandesa = "ROSHNI mein khush amdeed"
+rakho sach = sahi
+
+tanqeed Print originals
+dikhao x
+dikhao y
+dikhao sandesa
+dikhao sach
+
+tanqeed Reassign
+x = 99
+dikhao x
