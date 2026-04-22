@@ -1,0 +1,13 @@
+tanqeed Test 5: Logical operators
+
+rakho a = sahi
+rakho b = ghalat
+
+dikhao a aur b
+dikhao a ya b
+dikhao nai a
+dikhao nai b
+
+tanqeed Chained logic
+dikhao sahi aur sahi aur sahi
+dikhao ghalat ya ghalat ya sahi

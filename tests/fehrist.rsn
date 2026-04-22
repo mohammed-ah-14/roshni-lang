@@ -1,0 +1,15 @@
+tanqeed Test 9: Lists
+
+rakho rang = fehrist("laal", "sabz", "neela")
+
+tanqeed Access by index
+dikhao lo rang[0]
+dikhao lo rang[1]
+dikhao lo rang[2]
+
+tanqeed Print the whole list
+dikhao rang
+
+tanqeed Numbers list
+rakho nums = fehrist(100, 200, 300)
+dikhao lo nums[0] + lo nums[2]

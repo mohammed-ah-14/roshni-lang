@@ -1,0 +1,20 @@
+tanqeed Test 4: Comparisons
+
+rakho x = 10
+rakho y = 20
+
+tanqeed Symbol form
+dikhao x == y
+dikhao x != y
+dikhao x < y
+dikhao x > y
+dikhao x <= 10
+dikhao x >= 10
+
+tanqeed Word form
+dikhao x barabar y
+dikhao x nai-barabar y
+dikhao x kam y
+dikhao x zyada y
+dikhao x kam-ya-barabar 10
+dikhao x zyada-ya-barabar 10

@@ -1,0 +1,19 @@
+tanqeed Test 3: Arithmetic
+
+rakho a = 20
+rakho b = 6
+
+tanqeed Symbol operators
+dikhao a + b
+dikhao a - b
+dikhao a * b
+dikhao a / b
+
+tanqeed Word operators (exact same result)
+dikhao a jama b
+dikhao a tafreeq b
+dikhao a zarb b
+dikhao a taqseem b
+
+tanqeed Mixed in one expression
+dikhao (a + b) * 2

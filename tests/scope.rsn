@@ -1,0 +1,17 @@
+tanqeed Test 13: Scope
+
+rakho x = 100
+
+banao inner () ->
+  tanqeed x from outer scope is visible here
+  dikhao x
+  rakho y = 999
+  tanqeed y only lives inside this function
+end
+
+bulao inner
+tanqeed y is gone now - the next line would crash if uncommented
+tanqeed dikhao y
+
+tanqeed Outer x is unchanged
+dikhao x
