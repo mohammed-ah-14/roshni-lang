@@ -84,7 +84,13 @@
 (define-lex-abbrevs
   (digit   (:/ "09"))
   (letter  (:or (:/ "az") (:/ "AZ")))
-  (id-char (:or letter digit (char-set "_"))))
+  ;; Urdu letters mainly live in Arabic Unicode blocks.
+  ;; This allows names like مثال and جمع_عدد.
+  (urdu-letter (:or (:/ #\u0600 #\u06FF)
+                    (:/ #\u0750 #\u077F)
+                    (:/ #\u08A0 #\u08FF)))
+  (id-start (:or letter urdu-letter))
+  (id-char (:or id-start digit (char-set "_"))))
 
 
 ;; ── 4. The lexer ──────────────────────────────────────────
@@ -96,64 +102,97 @@
     (roshni-lexer input-port))
 
    ;; ── Comments ─────────────────────────────────────────
-   ;; tanqeed starts a comment; rest of line is ignored
+  ;; tanqeed / تنقید starts a comment; rest of line is ignored
    ;; e.g.  tanqeed yeh ek comment hai
    ((:seq "tanqeed" (:* (:~ "\n")))
     (roshni-lexer input-port))
+  ((:seq "تنقید" (:* (:~ "\n")))
+   (roshni-lexer input-port))
 
    ;; ── Hyphenated compound keywords ─────────────────────
    ;; MUST appear before the simple keyword rules.
    ;; Longest-match guarantees "nai-barabar" (12 chars) beats
    ;; "nai" (3 chars) when the input contains the full word.
-   ("warna-agar"         (token-WARNA_AGAR))   ;; else-if
-   ("nai-barabar"        (token-NEQ))           ;; !=
-   ("zyada-ya-barabar"   (token-GTE))           ;; >=
-   ("kam-ya-barabar"     (token-LTE))           ;; <=
+  ("warna-agar"         (token-WARNA_AGAR))   ;; else-if
+  ("ورنہ-اگر"           (token-WARNA_AGAR))
+  ("nai-barabar"        (token-NEQ))           ;; !=
+  ("نہیں-برابر"         (token-NEQ))
+  ("zyada-ya-barabar"   (token-GTE))           ;; >=
+  ("زیادہ-یا-برابر"     (token-GTE))
+  ("kam-ya-barabar"     (token-LTE))           ;; <=
+  ("کم-یا-برابر"        (token-LTE))
 
    ;; ── Keywords ─────────────────────────────────────────
-   ("rakho"    (token-RAKHO))
-   ("banao"    (token-BANAO))
-   ("bulao"    (token-BULAO))
-   ("dikhao"   (token-DIKHAO))
-   ("jabtak"   (token-JABTAK))
-   ("har"      (token-HAR))
-   ("agar"     (token-AGAR))
-   ("warna"    (token-WARNA))
-   ("fehrist"  (token-FEHRIST))
-   ("lo"       (token-LO))
-   ("wapas"    (token-WAPAS))
-   ("end"      (token-END))
-   ("sahi"     (token-SAHI))
-   ("ghalat"   (token-GHALAT))
-   ("as"       (token-AS))
+  ("rakho"    (token-RAKHO))
+  ("رکھو"     (token-RAKHO))
+  ("banao"    (token-BANAO))
+  ("بناؤ"     (token-BANAO))
+  ("bulao"    (token-BULAO))
+  ("بلاؤ"     (token-BULAO))
+  ("dikhao"   (token-DIKHAO))
+  ("دکھاؤ"    (token-DIKHAO))
+  ("jabtak"   (token-JABTAK))
+  ("جبتک"     (token-JABTAK))
+  ("har"      (token-HAR))
+  ("ہر"       (token-HAR))
+  ("agar"     (token-AGAR))
+  ("اگر"      (token-AGAR))
+  ("warna"    (token-WARNA))
+  ("ورنہ"     (token-WARNA))
+  ("fehrist"  (token-FEHRIST))
+  ("فہرست"    (token-FEHRIST))
+  ("lo"       (token-LO))
+  ("لو"       (token-LO))
+  ("wapas"    (token-WAPAS))
+  ("واپس"     (token-WAPAS))
+  ("end"      (token-END))
+  ("اختتام"   (token-END))
+  ("sahi"     (token-SAHI))
+  ("صحیح"     (token-SAHI))
+  ("ghalat"   (token-GHALAT))
+  ("غلط"      (token-GHALAT))
+  ("as"       (token-AS))
+  ("بطور"     (token-AS))
 
    ;; ── Logical operator keywords ─────────────────────────
-   ("aur"      (token-AUR))
-   ("ya"       (token-YA))
-   ("nai"      (token-NAI_NOT))
+  ("aur"      (token-AUR))
+  ("اور"      (token-AUR))
+  ("ya"       (token-YA))
+  ("یا"       (token-YA))
+  ("nai"      (token-NAI_NOT))
+  ("نہیں"     (token-NAI_NOT))
 
    ;; String concatenation keyword
-   ("jodna"    (token-JODNA))   ;; جوڑنا — joins any two values as strings   ;; unary NOT (not to be confused
+  ("jodna"    (token-JODNA))
+  ("جوڑنا"    (token-JODNA))   ;; joins any two values as strings
+                       ;; unary NOT (not to be confused
                                   ;; with ghalat which is the value false)
 
    ;; ── Word arithmetic operators ─────────────────────────
    ;; These emit the SAME token as their symbol counterparts,
    ;; so  "3 jama 4"  and  "3 + 4"  are 100% identical to the parser.
-   ("jama"     (token-PLUS))      ;; addition    جمع
-   ("tafreeq"  (token-MINUS))     ;; subtraction تفریق
-   ("zarb"     (token-TIMES))     ;; multiply    ضرب
-   ("taqseem"  (token-DIVIDE))    ;; divide      تقسیم
+  ("jama"     (token-PLUS))      ;; addition    جمع
+  ("جمع"      (token-PLUS))
+  ("tafreeq"  (token-MINUS))     ;; subtraction تفریق
+  ("تفریق"    (token-MINUS))
+  ("zarb"     (token-TIMES))     ;; multiply    ضرب
+  ("ضرب"      (token-TIMES))
+  ("taqseem"  (token-DIVIDE))    ;; divide      تقسیم
+  ("تقسیم"    (token-DIVIDE))
 
    ;; ── Word comparison operators ─────────────────────────
    ;; Same idea — emit the same tokens as < > == !=
-   ("barabar"  (token-EQ2))       ;; ==  برابر
-   ("zyada"    (token-GT))        ;; >   زیادہ
-   ("kam"      (token-LT))        ;; <   کم
+  ("barabar"  (token-EQ2))       ;; ==  برابر
+  ("برابر"    (token-EQ2))
+  ("zyada"    (token-GT))        ;; >   زیادہ
+  ("زیادہ"    (token-GT))
+  ("kam"      (token-LT))        ;; <   کم
+  ("کم"       (token-LT))
 
    ;; ── Identifiers ──────────────────────────────────────
    ;; Must come AFTER all keyword rules; longest-match handles
    ;; the case where a keyword is a prefix of an identifier.
-   ((:seq letter (:* id-char))
+  ((:seq id-start (:* id-char))
     (token-ID lexeme))
 
    ;; ── Number literals ───────────────────────────────────
