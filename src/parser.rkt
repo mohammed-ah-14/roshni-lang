@@ -7,18 +7,32 @@
 
 ;; ═══════════════════════════════════════════════════════════
 ;; ROSHNI PARSER — src/parser.rkt
+;;
 ;; Turns the token stream from lexer.rkt into an AST.
 ;;
-;; Each grammar rule returns a tagged list (AST node), e.g.:
-;;   (dhara-decl "x" (num-lit 5))
-;;   (jalao-decl "fib" ("n") (body ...))
-;;   (dikha-stmt (str-lit "hello"))
+;; Think of the parser like a grammar teacher reading a sentence:
+;;   "rakho x = 5 + 3"
+;; The teacher recognises: "this is a declaration, the name is x,
+;; and the value is the expression 5 + 3."  The AST is just
+;; that understanding written as a nested list:
+;;   (dhara-decl "x" (bin-op + (num-lit 5) (num-lit 3)))
+;;
+;; LALR(1): the parser peeks at ONE upcoming token to decide
+;; which grammar rule applies.
+;;
+;; New in this version:
+;;   • All keywords renamed (rakho/banao/dikhao/…)
+;;   • warna-agar (elif) with a right-recursive agar-tail rule
+;;   • Logical operators: aur (and), ya (or), nai (not)
+;;   • HAR replaces DOHRA HAR; JABTAK replaces DOHRA
+;;   • FEHRIST replaces JAMA for list literals
+;;   • LO replaces NIKALO for index access
+;;   • Internal AST tags are UNCHANGED — only surface syntax changed
 ;; ═══════════════════════════════════════════════════════════
 
 
-;; ── Token source: wraps the lexer for the parser ──────────
-;; The parser needs a thunk (a zero-arg function) that returns
-;; the next token each time it is called.
+;; ── Wrap the lexer into a thunk (zero-arg function) ───────
+;; The parser calls this thunk repeatedly to get the next token.
 (define (make-token-thunk port)
   (lambda ()
     (roshni-lexer port)))
@@ -26,276 +40,243 @@
 
 ;; ═══════════════════════════════════════════════════════════
 ;; THE PARSER
-;; define-parser uses LALR(1) — it reads one token ahead to
-;; decide which rule to apply.
 ;; ═══════════════════════════════════════════════════════════
 (define roshni-parser
   (parser
 
-   ;; ── Which token signals end of input ──
    (end EOF)
-
-   ;; ── Token declarations ──
-   ;; value-tokens carry a value (ID, NUMBER, FLOAT, STRING)
-   ;; punct-tokens are empty (keywords, operators, punctuation)
    (tokens value-tokens punct-tokens)
 
-   ;; ── Error handler ──
    (error (lambda (tok-ok? tok-name tok-value)
             (if tok-ok?
-                (error (format "ROSHNI parse error: unexpected token '~a' (value: ~a)"
+                (error (format "ROSHNI parse error: ghalat token '~a' (qeemat: ~a)"
                                tok-name tok-value))
-                (error (format "ROSHNI parse error: invalid token '~a'"
+                (error (format "ROSHNI parse error: anjaan token '~a'"
                                tok-name)))))
-    (suppress)
+   (suppress)
 
-   ;; ── Operator precedence (low → high, bottom wins) ──
-   ;; This resolves ambiguity in arithmetic expressions.
-   ;; Higher position = tighter binding (evaluated first).
+   ;; ── Operator precedence (low → high, bottom wins) ──────
+   ;;
+   ;; Imagine a weighing scale: heavier operators sink to the
+   ;; bottom of the expression tree, meaning they bind tighter.
+   ;;
+   ;; Example:  sahi ya ghalat aur sahi
+   ;;           → sahi ya (ghalat aur sahi)   ← aur binds tighter
+   ;;
    (precs
-    (left  EQ2 NEQ)          ; == !=   (lowest)
-    (left  LT GT LTE GTE)    ; < > <= >=
-    (left  PLUS MINUS)       ; + -
-    (left  TIMES DIVIDE))    ; * /     (highest among ops)
+    (left  YA)              ;; ya  (or)          — loosest
+    (left  AUR)             ;; aur (and)
+    (right NAI_NOT)         ;; nai (not)         — unary prefix
+    (left  JODNA)           ;; jodna (concat)    — below comparisons so
+                            ;;   "val: " jodna 3 + 4  →  "val: 7"  ✓
+    (left  EQ2 NEQ)         ;; == barabar  != nai-barabar
+    (left  LT GT LTE GTE)  ;; < kam  > zyada  <= >=
+    (left  PLUS MINUS)      ;; + jama  - tafreeq
+    (left  TIMES DIVIDE))   ;; * zarb  / taqseem — tightest
 
-   ;; ── Starting rule ──
    (start program)
 
    ;; ════════════════════════════════════════════════════════
    ;; GRAMMAR RULES
-   ;; Format: (rule-name
-   ;;           [(token token ...) action]
-   ;;           [(token token ...) action] ...)
-   ;; $1 $2 $3 ... refer to the matched items left-to-right.
    ;; ════════════════════════════════════════════════════════
    (grammar
 
-    ;; ── program: the top level is a list of statements ────
+    ;; ── program: a list of top-level statements ───────────
     (program
-     [()           '()]                         ; empty program
-     [(stmt program) (cons $1 $2)])             ; prepend stmt to rest
+     [()              '()]
+     [(stmt program)  (cons $1 $2)])
 
-    ;; ── stmt: all statement types ─────────────────────────
+    ;; ── stmt: all statement forms ─────────────────────────
     (stmt
-     [(dhara-stmt)   $1]   ; variable declaration
-     [(assign-stmt)  $1]   ; variable assignment
-     [(jalao-stmt)   $1]   ; function definition
-     [(dikha-stmt)   $1]   ; print statement
-     [(dohra-stmt)   $1]   ; loop (for-each or while)
-     [(jab-stmt)     $1]   ; conditional if/else
-     [(wapas-stmt)   $1]   ; return statement
-     [(expr-stmt)    $1])  ; standalone expression
+     [(rakho-stmt)   $1]    ;; variable declaration
+     [(assign-stmt)  $1]    ;; variable reassignment
+     [(banao-stmt)   $1]    ;; function definition
+     [(dikhao-stmt)  $1]    ;; print
+     [(jabtak-stmt)  $1]    ;; while loop
+     [(har-stmt)     $1]    ;; for-each loop
+     [(agar-stmt)    $1]    ;; if / elif / else
+     [(wapas-stmt)   $1]    ;; return
+     [(expr-stmt)    $1])   ;; expression as statement
 
-    ;; ── dhara: variable declaration ───────────────────────
-    ;; dhara x = <expr>
-    ;; AST: (dhara-decl "x" <expr-node>)
-    (dhara-stmt
-     [(DHARA ID EQ expr)
+    ;; ── rakho: variable declaration ──────────────────────
+    ;; rakho x = <expr>
+    ;; AST: (dhara-decl "x" <expr>)
+    ;; (internal tag kept as dhara-decl for interpreter compat.)
+    (rakho-stmt
+     [(RAKHO ID EQ expr)
       (list 'dhara-decl $2 $4)])
 
-    ;; ── assignment: variable reassignment ─────────────────
-    ;; x = <expr>
-    ;; AST: (assign-stmt "x" <expr-node>)
+    ;; ── assignment: variable reassignment ────────────────
+    ;; x = <expr>     (no rakho — updating existing variable)
+    ;; AST: (assign-stmt "x" <expr>)
     (assign-stmt
      [(ID EQ expr)
       (list 'assign-stmt $1 $3)])
 
-    ;; ── jalao: function definition ────────────────────────
-    ;; jalao funcName (param1 param2 ...) -> body... end
+    ;; ── banao: function definition ────────────────────────
+    ;; banao funcName (p1 p2) -> body end
     ;; AST: (jalao-decl "funcName" ("p1" "p2") (body...))
-    (jalao-stmt
-     [(JALAO ID LPAREN param-list RPAREN ARROW body END)
+    (banao-stmt
+     [(BANAO ID LPAREN param-list RPAREN ARROW body END)
       (list 'jalao-decl $2 $4 $7)])
 
     ;; ── param-list: comma-separated parameter names ───────
-    ;; Returns a plain list of strings: ("n") or ("x" "y")
     (param-list
-     [()                        '()]
-     [(ID)                      (list $1)]
-     [(ID COMMA param-list)     (cons $1 $3)])
+     [()                      '()]
+     [(ID)                    (list $1)]
+     [(ID COMMA param-list)   (cons $1 $3)])
 
     ;; ── body: one or more statements ──────────────────────
-    ;; A body is a list of statement AST nodes.
-    ;; We use a dedicated rule so functions, loops, and
-    ;; conditionals all share the same body parsing logic.
+    ;; A body is the list of statements inside a block.
     (body
-     [(stmt)               (list $1)]
-     [(stmt body)          (cons $1 $2)])
+     [(stmt)         (list $1)]
+     [(stmt body)    (cons $1 $2)])
 
-    ;; ── dikha: print statement ────────────────────────────
-    ;; dikha <expr>
-    ;; AST: (dikha-stmt <expr-node>)
-    (dikha-stmt
-     [(DIKHA expr)
+    ;; ── dikhao: print ─────────────────────────────────────
+    ;; dikhao <expr>
+    ;; AST: (dikha-stmt <expr>)
+    (dikhao-stmt
+     [(DIKHAO expr)
       (list 'dikha-stmt $2)])
 
-    ;; ── dohra: loops ──────────────────────────────────────
-    ;; for-each:  dohra har <list-id> as <var> -> body end
-    ;; while:     dohra <cond-expr> -> body end
-    ;; AST for-each: (dohra-har "listName" "x" (body...))
-    ;; AST while:    (dohra-while <cond> (body...))
-    (dohra-stmt
-     [(DOHRA HAR ID AS ID ARROW body END)
-      (list 'dohra-har $3 $5 $7)]
-     [(DOHRA expr ARROW body END)
+    ;; ── jabtak: while loop ────────────────────────────────
+    ;; jabtak <cond> -> body end
+    ;; AST: (dohra-while <cond> (body...))
+    (jabtak-stmt
+     [(JABTAK expr ARROW body END)
       (list 'dohra-while $2 $4)])
 
-    ;; ── jab/warna: if / else ──────────────────────────────
-    ;; jab <cond> -> body warna body end
-    ;; jab <cond> -> body end   (no else)
-    ;; AST: (jab-stmt <cond> (then-body) (else-body or '()))
-    (jab-stmt
-     [(JAB expr ARROW body WARNA body END)
-      (list 'jab-stmt $2 $4 $6)]
-     [(JAB expr ARROW body END)
-      (list 'jab-stmt $2 $4 '())])
+    ;; ── har: for-each loop ────────────────────────────────
+    ;; har <list-id> as <var> -> body end
+    ;; AST: (dohra-har "listName" "x" (body...))
+    (har-stmt
+     [(HAR ID AS ID ARROW body END)
+      (list 'dohra-har $2 $4 $6)])
+
+    ;; ── agar/warna-agar/warna: if / elif / else ───────────
+    ;;
+    ;; agar x > 5 ->       ← AGAR opens the if
+    ;;   body
+    ;; warna-agar x == 5 ->  ← WARNA_AGAR (zero or more)
+    ;;   body
+    ;; warna               ← WARNA opens the else
+    ;;   body
+    ;; end
+    ;;
+    ;; The "agar-tail" rule handles everything AFTER the then-body:
+    ;;   END              → no else, close block
+    ;;   WARNA body END   → plain else
+    ;;   WARNA_AGAR ...   → elif, which recurses into another agar-tail
+    ;;
+    ;; Because elif becomes a nested jab-stmt inside the else-body,
+    ;; the interpreter handles it for free — it just runs eval-body
+    ;; on the else-body, which hits the nested jab-stmt.
+    ;;
+    ;; AST: (jab-stmt <cond> (then-body) (else-body-or-'()))
+    ;;
+    (agar-stmt
+     [(AGAR expr ARROW body agar-tail)
+      (list 'jab-stmt $2 $4 $5)])
+
+    (agar-tail
+     ;; No else — block ends here
+     [(END)
+      '()]
+     ;; Plain warna (else)
+     [(WARNA body END)
+      $2]
+     ;; warna-agar (elif) — wraps as a single jab-stmt in a list,
+     ;; so eval-body will execute it naturally as the else branch.
+     [(WARNA_AGAR expr ARROW body agar-tail)
+      (list (list 'jab-stmt $2 $4 $5))])
 
     ;; ── wapas: return ─────────────────────────────────────
     ;; wapas <expr>
-    ;; AST: (wapas-stmt <expr-node>)
+    ;; AST: (wapas-stmt <expr>)
     (wapas-stmt
      [(WAPAS expr)
       (list 'wapas-stmt $2)])
 
-    ;; ── expr-stmt: expression used as a statement ─────────
-    ;; Handles function calls standing alone on a line:
-    ;;   bulao fib 10
+    ;; ── expr-stmt: expression as a statement ─────────────
+    ;; Allows  bulao fib 10  as a standalone line.
     (expr-stmt
      [(expr)
       (list 'expr-stmt $1)])
 
     ;; ── expr: all expressions ─────────────────────────────
-    ;; Arithmetic, comparison, literals, calls, identifiers.
-    ;; Precedence rules above handle ambiguity automatically.
+    ;;
+    ;; Word operators (jama, tafreeq, …) and symbol operators
+    ;; (+, -, …) produce the SAME tokens, so the parser sees
+    ;; only one set of rules here.
+    ;;
     (expr
-     ;; Binary arithmetic
-     [(expr PLUS   expr)  (list 'bin-op '+ $1 $3)]
-     [(expr MINUS  expr)  (list 'bin-op '- $1 $3)]
-     [(expr TIMES  expr)  (list 'bin-op '* $1 $3)]
-     [(expr DIVIDE expr)  (list 'bin-op '/ $1 $3)]
-     ;; Comparisons
-     [(expr EQ2    expr)  (list 'bin-op '== $1 $3)]
-     [(expr NEQ    expr)  (list 'bin-op '!= $1 $3)]
-     [(expr LT     expr)  (list 'bin-op '<  $1 $3)]
-     [(expr GT     expr)  (list 'bin-op '>  $1 $3)]
-     [(expr LTE    expr)  (list 'bin-op '<= $1 $3)]
-     [(expr GTE    expr)  (list 'bin-op '>= $1 $3)]
-     ;; Unary minus: -5  or  -(x + 1)
-     [(MINUS expr)        (list 'unary-op '- $2)]
-     ;; Parenthesised expression: (3 + 4)
+     ;; String concatenation — converts BOTH sides to their string
+     ;; representation before joining, so numbers/booleans work too:
+     ;;   "bhari hai: " jodna 5000 jodna " kg"  →  "bhari hai: 5000 kg"
+     [(expr JODNA  expr)   (list 'bin-op 'jodna $1 $3)]
+     ;; Arithmetic
+     [(expr PLUS   expr)   (list 'bin-op '+   $1 $3)]
+     [(expr MINUS  expr)   (list 'bin-op '-   $1 $3)]
+     [(expr TIMES  expr)   (list 'bin-op '*   $1 $3)]
+     [(expr DIVIDE expr)   (list 'bin-op '/   $1 $3)]
+     ;; Comparison
+     [(expr EQ2    expr)   (list 'bin-op '==  $1 $3)]
+     [(expr NEQ    expr)   (list 'bin-op '!=  $1 $3)]
+     [(expr LT     expr)   (list 'bin-op '<   $1 $3)]
+     [(expr GT     expr)   (list 'bin-op '>   $1 $3)]
+     [(expr LTE    expr)   (list 'bin-op '<=  $1 $3)]
+     [(expr GTE    expr)   (list 'bin-op '>=  $1 $3)]
+     ;; Logical binary
+     [(expr AUR    expr)   (list 'bin-op 'and $1 $3)]
+     [(expr YA     expr)   (list 'bin-op 'or  $1 $3)]
+     ;; Logical unary: nai sahi  →  ghalat
+     [(NAI_NOT expr)       (list 'unary-op 'not $2)]
+     ;; Arithmetic unary: -5  or  -(x + 1)
+     [(MINUS expr)         (list 'unary-op '-   $2)]
+     ;; Parenthesised: (3 + 4)
      [(LPAREN expr RPAREN) $2]
-     ;; Function call: bulao fib 10  or  bulao add x y
-     [(BULAO ID arg-list) (list 'bulao-call $2 $3)]
-     ;; List index: nikalo nums[0]
-     [(NIKALO ID LBRACK expr RBRACK) (list 'nikalo-expr $2 $4)]
-     ;; List literal: jama(1, 2, 3)
-     [(JAMA LPAREN expr-list RPAREN) (list 'jama-expr $3)]
+     ;; Function call: bulao fib 10
+     [(BULAO ID arg-list)  (list 'bulao-call $2 $3)]
+     ;; Index access: lo nums[0]
+     [(LO ID LBRACK expr RBRACK)
+      (list 'nikalo-expr $2 $4)]
+     ;; List literal: fehrist(1, 2, 3)
+     [(FEHRIST LPAREN expr-list RPAREN)
+      (list 'jama-expr $3)]
      ;; Literals
-     [(NUMBER)  (list 'num-lit  $1)]
+     [(NUMBER)  (list 'num-lit   $1)]
      [(FLOAT)   (list 'float-lit $1)]
-     [(STRING)  (list 'str-lit  $1)]
-     [(HAAN)    (list 'bool-lit #t)]
-     [(NAHI)    (list 'bool-lit #f)]
+     [(STRING)  (list 'str-lit   $1)]
+     [(SAHI)    (list 'bool-lit  #t)]
+     [(GHALAT)  (list 'bool-lit  #f)]
      ;; Variable reference
-     [(ID)      (list 'id-ref   $1)])
+     [(ID)      (list 'id-ref    $1)])
 
-    ;; ── arg-list: arguments for bulao calls ───────────────
-    ;; bulao fib 10           → one arg
-    ;; bulao add 3, 7         → two args (comma-separated)
-    ;; bulao greet            → no args
-    ;; Args are comma-separated expressions (like param-list).
+    ;; ── arg-list: arguments passed to bulao ───────────────
+    ;; bulao fib 10         → one arg
+    ;; bulao add 3, 7       → two args
+    ;; bulao greet          → no args
     (arg-list
-     [()                        '()]
-     [(expr)                    (list $1)]
-     [(expr COMMA arg-list)     (cons $1 $3)])
+     [()                      '()]
+     [(expr)                  (list $1)]
+     [(expr COMMA arg-list)   (cons $1 $3)])
 
-    ;; ── expr-list: comma-separated expressions ────────────
-    ;; Used inside jama(1, 2, 3)
+    ;; ── expr-list: comma-separated expressions ─────────────
+    ;; Used inside fehrist(1, 2, 3)
     (expr-list
-     [(expr)                    (list $1)]
-     [(expr COMMA expr-list)    (cons $1 $3)])
+     [(expr)                  (list $1)]
+     [(expr COMMA expr-list)  (cons $1 $3)])
 
-    ))) ;; end of define roshni-parser
-
-(provide parse-roshni)
+    ))) ;; end roshni-parser
 
 
 ;; ═══════════════════════════════════════════════════════════
 ;; PUBLIC API
 ;; parse-roshni : string → list of AST nodes
-;; This is what interpreter.rkt and main.rkt will call.
 ;; ═══════════════════════════════════════════════════════════
 (define (parse-roshni source-str)
   (let* ([port  (open-input-string source-str)]
          [thunk (make-token-thunk port)])
     (roshni-parser thunk)))
 
-
-; ;; ═══════════════════════════════════════════════════════════
-; ;; PARSER TESTS — remove before final submission
-; ;; Run with:  racket src/parser.rkt
-; ;; ═══════════════════════════════════════════════════════════
-; (define (test-parse label code)
-;   (display (string-append "--- " label " ---\n"))
-;   (let ([ast (parse-roshni code)])
-;     (for-each (lambda (node)
-;                 (display node)
-;                 (newline))
-;               ast))
-;   (newline))
-
-; ;; Test 1: variable declaration
-; (test-parse "dhara (variable)"
-;   "dhara x = 5")
-
-; ;; Test 2: print string
-; (test-parse "dikha (print)"
-;   "dikha \"salam duniya\"")
-
-; ;; Test 3: arithmetic expression
-; (test-parse "arithmetic"
-;   "dhara jawab = (3 + 4) * 2")
-
-; ;; Test 4: boolean
-; (test-parse "boolean"
-;   "dhara flag = haan")
-
-; ;; Test 5: list
-; (test-parse "jama (list)"
-;   "dhara nums = jama(1, 2, 3)")
-
-; ;; Test 6: function call
-; (test-parse "bulao (function call)"
-;   "bulao double 10")
-
-; ;; Test 7: conditional
-; (test-parse "jab/warna (if/else)"
-;   "jab x == 5 ->
-;      dikha \"haan!\"
-;    warna
-;      dikha \"nahi!\"
-;    end")
-
-; ;; Test 8: for-each loop
-; (test-parse "dohra har (for-each loop)"
-;   "dohra har nums as x ->
-;      dikha x
-;    end")
-
-; ;; Test 9: function definition
-; (test-parse "jalao (function definition)"
-;   "jalao double (n) ->
-;      wapas n * 2
-;    end")
-
-; ;; Test 10: full fibonacci program
-; (test-parse "fibonacci program"
-;   "jalao fib (n) ->
-;      jab n <= 1 ->
-;        wapas n
-;      warna
-;        wapas (bulao fib n) + (bulao fib n)
-;      end
-;    end
-;    dhara jawab = bulao fib 5
-;    dikha jawab")
+(provide parse-roshni)

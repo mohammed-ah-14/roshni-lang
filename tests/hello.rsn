@@ -1,3 +1,10 @@
-%% Test 1: Hello World
-dikha "Salam Duniya!"
-dikha "ROSHNI mein aapka swaagat hai"
+%% Test 2: Arithmetic
+dhara a = 10
+dhara b = 3
+dikha a + b
+dikha a - b
+dikha a * b
+dikha a / b
+dikha (a + b) * 2
+dhara jawab = (8 + 2) * 5
+dikha jawab
