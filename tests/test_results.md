@@ -311,3 +311,104 @@ Darjah: C
 3 x 5 = 15
 ```
 Test result: 🟢 Passed
+
+# Testing Urdu Scripts
+
+## urdu_keywords.rsn (Test 15: Urdu keywords)
+Expected output:
+
+```
+12
+x chhota hai
+1
+2
+3
+sahi
+```
+Actual output:
+
+```
+12
+x chhota hai
+1
+2
+3
+sahi
+```
+Test result: 🟢 Passed
+
+## urdu_identifiers.rsn (Test 16: Urdu identifiers)
+Expected output:
+
+```
+15
+15
+identifier test sahi
+```
+Actual output:
+
+```
+15
+15
+identifier test sahi
+```
+Test result: 🟢 Passed
+
+## urdu_control_flow.rsn (Test 17: Urdu control flow)
+Expected output:
+
+```
+C
+1
+2
+3
+```
+Actual output:
+
+```
+C
+1
+2
+3
+```
+Test result: 🟢 Passed
+
+## urdu_collections_ops.rsn (Test 18: Urdu lists and operators)
+Expected output:
+
+```
+4
+20
+5
+15
+5
+```
+Actual output:
+
+```
+4
+20
+5
+15
+5
+```
+Test result: 🟢 Passed
+
+## urdu_logic_jodna.rsn (Test 19: Urdu logical and jodna)
+Expected output:
+
+```
+ghalat
+sahi
+sahi
+نتیجہ: 7
+```
+Actual output:
+
+```
+ghalat
+sahi
+sahi
+نتیجہ: 7
+```
+Test result: 🟢 Passed
